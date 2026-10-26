@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Lịch Cá Nhân VN</title>
+
+    <!-- CẤU HÌNH ĐỂ CHẠY NHƯ APP TRÊN ĐIỆN THOẠI (ANDROID & IPHONE PWA) -->
+    <meta name="theme-color" content="#1d4ed8">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Lịch Cá Nhân">
+
+    <!-- Biểu tượng App (Icon) tự động nhúng sẵn không cần file ảnh ngoài -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%231d4ed8'/><rect x='12' y='28' width='76' height='60' rx='10' fill='%23ffffff'/><text x='50' y='72' font-family='Arial' font-size='40' font-weight='bold' fill='%23dc2626' text-anchor='middle'>VN</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%231d4ed8'/><rect x='12' y='28' width='76' height='60' rx='10' fill='%23ffffff'/><text x='50' y='72' font-family='Arial' font-size='40' font-weight='bold' fill='%23dc2626' text-anchor='middle'>VN</text></svg>">
+
+    <style>
+        :root {
+            --primary: #1d4ed8;
+            --primary-hover: #1e40af;
+            --primary-light: #dbeafe;
+            --accent-red: #dc2626;
+            --accent-red-light: #fef2f2;
+            --success: #16a34a;
+            --bg-body: #f1f5f9;
+            --bg-card: #ffffff;
+            --bg-cell-hover: #f8fafc;
+            --bg-muted: #f8fafc;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
+            --radius: 12px;
+        }
+
+        [data-theme="dark"] {
+            --primary: #3b82f6;
+            --primary-hover: #60a5fa;
+            --primary-light: #1e3a8a;
+            --accent-red: #f87171;
+            --accent-red-light: #450a0a;
+            --success: #22c55e;
+            --bg-body: #0f172a;
+            --bg-card: #1e293b;
+            --bg-cell-hover: #334155;
+            --bg-muted: #0f172a;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.5;
+            padding-bottom: 40px;
+            padding-top: env(safe-area-inset-top);
+        }
+
+        .navbar {
+            background-color: var(--bg-card);
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 14px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow);
+        }
+
+        .navbar-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 800;
+            font-size: 1.15rem;
+            color: var(--primary);
+        }
+
+        .brand-badge {
+            background: var(--accent-red);
+            color: #fff;
+            font-size: 0.7rem;
+            padding: 2px 7px;
+            border-radius: 99px;
+            font-weight: 600;
+        }
+
+        .nav-controls {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.86rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-card);
+            color: var(--text-main);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary);
+        }
+
+        .btn-danger {
+            background-color: var(--accent-red);
+            color: #ffffff;
+            border-color: var(--accent-red);
+        }
+
+        .btn-sm {
+            padding: 5px 9px;
+            font-size: 0.78rem;
+        }
+
+        .select-input, .search-input, .form-control {
+            padding: 8px 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-size: 0.88rem;
+            outline: none;
+        }
+
+        .search-wrapper {
+            position: relative;
+            min-width: 200px;
+            flex: 1;
+        }
+
+        .search-input { width: 100%; }
+
+        .main-container {
+            max-width: 1400px;
+            margin: 14px auto;
+            padding: 0 12px;
+            display: grid;
+            grid-template-columns: 1fr 420px;
+            gap: 16px;
+            align-items: start;
+        }
+
+        @media (max-width: 1024px) {
+            .main-container { grid-template-columns: 1fr; }
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .calendar-header-bar {
+            padding: 12px 16px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--bg-muted);
+        }
+
+        .month-title-group h2 { font-size: 1.2rem; font-weight: 800; }
+        .month-title-group p { font-size: 0.82rem; color: var(--text-muted); }
+
+        .weekdays-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            background-color: var(--primary);
+            color: #ffffff;
+            font-weight: 700;
+            text-align: center;
+            font-size: 0.8rem;
+        }
+
+        .weekday-cell { padding: 8px 2px; border-right: 1px solid rgba(255, 255, 255, 0.15); }
+        .weekday-cell.weekend { background-color: #b91c1c; }
+
+        .days-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            background-color: var(--border-color);
+            gap: 1px;
+        }
+
+        .day-cell {
+            background-color: var(--bg-card);
+            min-height: 86px;
+            padding: 6px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            user-select: none;
+        }
+
+        .day-cell.other-month { background-color: var(--bg-muted); opacity: 0.45; }
+        .day-cell.is-today { background-color: var(--primary-light); }
+        .day-cell.is-today .solar-num {
+            background-color: var(--primary);
+            color: #ffffff;
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .day-cell.is-selected {
+            outline: 2.5px solid var(--primary);
+            outline-offset: -2.5px;
+            z-index: 2;
+        }
+
+        .day-top { display: flex; justify-content: space-between; align-items: flex-start; }
+        .solar-num { font-size: 1rem; font-weight: 700; }
+        .day-cell.sunday .solar-num { color: var(--accent-red); }
+        .day-cell.is-today.sunday .solar-num { color: #ffffff; }
+
+        .lunar-badge { font-size: 0.72rem; color: var(--text-muted); font-weight: 600; }
+        .lunar-badge.lunar-special {
+            color: var(--accent-red);
+            font-weight: 700;
+            background-color: var(--accent-red-light);
+            padding: 0 4px;
+            border-radius: 4px;
+        }
+
+        .day-bottom { margin-top: 4px; display: flex; flex-direction: column; gap: 3px; }
+        .lunar-event-tag {
+            font-size: 0.62rem;
+            color: var(--accent-red);
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .task-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.66rem;
+            padding: 1px 4px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        .task-indicator.all-done { background-color: rgba(22, 163, 74, 0.14); color: var(--success); }
+        .task-indicator.has-pending { background-color: rgba(29, 78, 216, 0.12); color: var(--primary); }
+
+        .bloc-header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%);
+            color: #ffffff;
+            padding: 16px;
+            text-align: center;
+        }
+        .bloc-weekday { font-size: 0.95rem; font-weight: 600; text-transform: uppercase; }
+        .bloc-solar-day { font-size: 3rem; font-weight: 900; line-height: 1.1; margin: 4px 0; }
+        .bloc-solar-month-year { font-size: 0.9rem; }
+        .bloc-lunar-box {
+            margin-top: 12px;
+            background-color: rgba(255, 255, 255, 0.14);
+            border-radius: 8px;
+            padding: 8px 10px;
+            text-align: left;
+            font-size: 0.82rem;
+        }
+        .bloc-lunar-row { display: flex; justify-content: space-between; margin-bottom: 3px; gap: 8px; }
+
+        .detail-body { padding: 14px; }
+        .section-title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-weight: 700; }
+
+        .schedule-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+        .schedule-item {
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--primary);
+            border-radius: 8px;
+            padding: 8px 10px;
+            background-color: var(--bg-muted);
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+        }
+        .schedule-item.completed { border-left-color: var(--success); opacity: 0.72; }
+        .schedule-item.completed .schedule-title { text-decoration: line-through; color: var(--text-muted); }
+        .schedule-checkbox { margin-top: 4px; width: 18px; height: 18px; accent-color: var(--success); }
+        .schedule-content { flex: 1; min-width: 0; }
+        .schedule-time { font-size: 0.74rem; font-weight: 700; color: var(--primary); background: var(--primary-light); padding: 1px 6px; border-radius: 4px; }
+        .schedule-title { font-weight: 700; font-size: 0.92rem; margin-top: 2px; }
+        .schedule-meta { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
+        .schedule-actions { display: flex; gap: 4px; }
+
+        .schedule-form { border-top: 1px solid var(--border-color); padding-top: 12px; }
+        .form-grid-time { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+        .form-group { margin-bottom: 8px; }
+        .form-group label { display: block; font-size: 0.78rem; font-weight: 600; margin-bottom: 3px; color: var(--text-muted); }
+        .form-control { width: 100%; }
+        textarea.form-control { min-height: 56px; resize: vertical; }
+
+        .tools-section {
+            max-width: 1400px;
+            margin: 0 auto 20px auto;
+            padding: 0 12px;
+        }
+        .tool-box { padding: 14px 16px; }
+        .tool-box h3 { font-size: 1rem; margin-bottom: 6px; color: var(--primary); }
+        .tool-box p { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 10px; }
+
+        .toast-container { position: fixed; bottom: 16px; right: 16px; left: 16px; z-index: 9999; display: flex; flex-direction: column; gap: 6px; pointer-events: none; }
+        .toast { background-color: var(--success); color: #fff; padding: 10px 14px; border-radius: 8px; font-size: 0.86rem; font-weight: 600; text-align: center; box-shadow: var(--shadow); }
+        .toast.error { background-color: var(--accent-red); }
+
+        .search-results-dropdown {
+            position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: 8px; box-shadow: var(--shadow); max-height: 260px;
+            overflow-y: auto; z-index: 200; display: none;
+        }
+        .search-result-item { padding: 8px 10px; border-bottom: 1px solid var(--border-color); cursor: pointer; font-size: 0.82rem; }
+
+        @media (max-width: 600px) {
+            .day-cell { min-height: 68px; padding: 4px; }
+            .solar-num { font-size: 0.88rem; }
+            .lunar-badge { font-size: 0.64rem; }
+            .weekday-cell { font-size: 0.72rem; padding: 6px 1px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="navbar-inner">
+            <div class="brand">
+                <span>📅 LỊCH CÁ NHÂN</span>
+                <span class="brand-badge">UTC+7</span>
+            </div>
+            <div class="nav-controls">
+                <button type="button" class="btn btn-primary" id="btnToday">Hôm nay</button>
+                <button type="button" class="btn" id="btnPrevMonth">◀</button>
+                <select id="selectMonth" class="select-input"></select>
+                <select id="selectYear" class="select-input"></select>
+                <button type="button" class="btn" id="btnNextMonth">▶</button>
+                <div class="search-wrapper">
+                    <input type="search" id="searchInput" class="search-input" placeholder="🔍 Tìm lịch trình...">
+                    <div id="searchResults" class="search-results-dropdown"></div>
+                </div>
+                <button type="button" class="btn" id="btnThemeToggle">🌙</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <section class="card">
+            <div class="calendar-header-bar">
+                <div class="month-title-group">
+                    <h2 id="currentMonthLabel">Tháng ...</h2>
+                    <p id="currentLunarMonthSummary">Âm lịch Việt Nam</p>
+                </div>
+            </div>
+            <div class="weekdays-grid">
+                <div class="weekday-cell">T2</div>
+                <div class="weekday-cell">T3</div>
+                <div class="weekday-cell">T4</div>
+                <div class="weekday-cell">T5</div>
+                <div class="weekday-cell">T6</div>
+                <div class="weekday-cell">T7</div>
+                <div class="weekday-cell weekend">CN</div>
+            </div>
+            <div class="days-grid" id="calendarGrid"></div>
+        </section>
+
+        <aside class="card" id="detailPanel">
+            <div class="bloc-header">
+                <div class="bloc-weekday" id="detailWeekday">Thứ ...</div>
+                <div class="bloc-solar-day" id="detailSolarDay">--</div>
+                <div class="bloc-solar-month-year" id="detailSolarMonthYear">Tháng -- năm ----</div>
+                <div class="bloc-lunar-box">
+                    <div class="bloc-lunar-row"><span>🌙 Âm lịch:</span><strong id="detailLunarDate">--</strong></div>
+                    <div class="bloc-lunar-row"><span>📜 Can chi:</span><span id="detailCanChi">--</span></div>
+                    <div class="bloc-lunar-row"><span>🌾 Tiết khí:</span><span id="detailSolarTerm">--</span></div>
+                </div>
+            </div>
+
+            <div class="detail-body">
+                <div class="section-title">
+                    <span>📌 Lịch trình (<span id="taskCountBadge">0</span>)</span>
+                    <button type="button" class="btn btn-sm" id="btnScrollToForm">+ Thêm việc</button>
+                </div>
+                <div class="schedule-list" id="scheduleList"></div>
+
+                <form class="schedule-form" id="scheduleForm">
+                    <div class="section-title" style="margin-bottom: 6px;">
+                        <span id="formTitle">✨ Thêm lịch trình</span>
+                        <button type="button" class="btn btn-sm" id="btnCancelEdit" style="display:none;">Hủy sửa</button>
+                    </div>
+                    <input type="hidden" id="editingTaskId" value="">
+                    <div class="form-grid-time">
+                        <div>
+                            <label for="taskStartTime">Giờ bắt đầu</label>
+                            <input type="time" id="taskStartTime" class="form-control">
+                        </div>
+                        <div>
+                            <label for="taskEndTime">Giờ kết thúc</label>
+                            <input type="time" id="taskEndTime" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="taskTitle">Tên công việc / Sự kiện *</label>
+                        <input type="text" id="taskTitle" class="form-control" placeholder="VD: Học bài, Tập thể dục..." required>
+                    </div>
+                    <div class="form-group">
+                        <label for="taskLocation">Địa điểm</label>
+                        <input type="text" id="taskLocation" class="form-control" placeholder="VD: Phòng học, Công viên...">
+                    </div>
+                    <div class="form-group">
+                        <label for="taskNotes">Ghi chú chi tiết</label>
+                        <textarea id="taskNotes" class="form-control" placeholder="Ghi chú thêm..."></textarea>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button type="submit" class="btn btn-primary" style="flex: 1;">💾 Lưu lịch trình</button>
+                        <button type="button" class="btn" id="btnLoadSampleDay">⚡ Mẫu</button>
+                    </div>
+                </form>
+            </div>
+        </aside>
+    </main>
+
+    <section class="tools-section">
+        <div class="card tool-box">
+            <h3>🛡️ Sao lưu & Chuyển dữ liệu giữa Máy tính / Điện thoại (.JSON)</h3>
+            <p>Xuất tệp JSON để sao lưu hoặc chuyển lịch trình từ máy tính sang điện thoại của bạn.</p>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                <button type="button" class="btn btn-primary" id="btnExportJson">⬇️ Xuất tệp (.JSON)</button>
+                <label class="btn" style="margin: 0;">
+                    ⬆️ Nhập tệp (.JSON)
+                    <input type="file" id="inputImportJson" accept=".json,application/json" style="display: none;">
+                </label>
+                <button type="button" class="btn btn-danger btn-sm" id="btnClearAllData">🗑️ Xóa hết</button>
+            </div>
+        </div>
+    </section>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        /* THUẬT TOÁN ÂM LỊCH VIỆT NAM UTC+7 */
+        const VnLunarEngine = (() => {
+            const PI = Math.PI, VN_TZ = 7.0;
+            const CAN = ["Giáp", "Ất", "Bính", "Đinh", "Mậu", "Kỷ", "Canh", "Tân", "Nhâm", "Quý"];
+            const CHI = ["Tý", "Sửu", "Dần", "Mão", "Thìn", "Tỵ", "Ngọ", "Mùi", "Thân", "Dậu", "Tuất", "Hợi"];
+            const TIET = ["Xuân phân","Thanh minh","Cốc vũ","Lập hạ","Tiểu mãn","Mang chủng","Hạ chí","Tiểu thử","Đại thử","Lập thu","Xử thử","Bạch lộ","Thu phân","Hàn lộ","Sương giáng","Lập đông","Tiểu tuyết","Đại tuyết","Đông chí","Tiểu hàn","Đại hàn","Lập xuân","Vũ thủy","Kinh trập"];
+            const INT = d => Math.floor(d);
+
+            function jdFromDate(dd, mm, yy) {
+                const a = INT((14 - mm) / 12), y = yy + 4800 - a, m = mm + 12 * a - 3;
+                let jd = dd + INT((153 * m + 2) / 5) + 365 * y + INT(y / 4) - INT(y / 100) + INT(y / 400) - 32045;
+                if (jd < 2299161) jd = dd + INT((153 * m + 2) / 5) + 365 * y + INT(y / 4) - 32083;
+                return jd;
+            }
+
+            function getNewMoonDay(k, tz) {
+                const T = k / 1236.85, T2 = T * T, T3 = T2 * T, dr = PI / 180;
+                let Jd1 = 2415020.75933 + 29.53058868 * k + 0.0001178 * T2 - 0.000000155 * T3 + 0.00033 * Math.sin((166.56 + 132.87 * T - 0.009173 * T2) * dr);
+                const M = 359.2242 + 29.10535608 * k - 0.0000333 * T2 - 0.00000347 * T3;
+                const Mpr = 306.0253 + 385.81691806 * k + 0.0107306 * T2 + 0.00001236 * T3;
+                const F = 21.2964 + 390.67050646 * k - 0.0016528 * T2 - 0.00000239 * T3;
+                let C1 = (0.1734 - 0.000393 * T) * Math.sin(M * dr) + 0.0021 * Math.sin(2 * dr * M) - 0.4068 * Math.sin(Mpr * dr) + 0.0161 * Math.sin(dr * 2 * Mpr) - 0.0004 * Math.sin(dr * 3 * Mpr) + 0.0104 * Math.sin(dr * 2 * F) - 0.0051 * Math.sin(dr * (M + Mpr)) - 0.0074 * Math.sin(dr * (M - Mpr)) + 0.0004 * Math.sin(dr * (2 * F + M)) - 0.0004 * Math.sin(dr * (2 * F - M)) - 0.0006 * Math.sin(dr * (2 * F + Mpr)) + 0.0010 * Math.sin(dr * (2 * F - Mpr)) + 0.0005 * Math.sin(dr * (2 * Mpr + M));
+                const deltat = T < -11 ? (0.001 + 0.000839 * T + 0.0002261 * T2 - 0.00000845 * T3 - 0.000000081 * T * T3) : (-0.000278 + 0.000265 * T + 0.000262 * T2);
+                return INT(Jd1 + C1 - deltat + 0.5 + tz / 24);
+            }
+
+            function getSunLongitude(jdn, tz) {
+                const T = (jdn - 2451545.5 - tz / 24) / 36525, T2 = T * T, dr = PI / 180;
+                const M = 357.52910 + 35999.05030 * T - 0.0001559 * T2 - 0.00000048 * T * T2;
+                const L0 = 280.46645 + 36000.76983 * T + 0.0003032 * T2;
+                let L = (L0 + (1.914600 - 0.004817 * T - 0.000014 * T2) * Math.sin(dr * M) + (0.019993 - 0.000101 * T) * Math.sin(dr * 2 * M) + 0.000290 * Math.sin(dr * 3 * M)) * dr;
+                L = L - PI * 2 * INT(L / (PI * 2));
+                return INT((L / PI) * 6);
+            }
+
+            function getSolarTermName(jd, tz) {
+                const T = (jd - 2451545.5 - tz / 24) / 36525, T2 = T * T, dr = PI / 180;
+                const M = 357.52910 + 35999.05030 * T - 0.0001559 * T2 - 0.00000048 * T * T2;
+                const L0 = 280.46645 + 36000.76983 * T + 0.0003032 * T2;
+                let L = (L0 + (1.914600 - 0.004817 * T - 0.000014 * T2) * Math.sin(dr * M) + (0.019993 - 0.000101 * T) * Math.sin(dr * 2 * M) + 0.000290 * Math.sin(dr * 3 * M)) * dr;
+                L = L - PI * 2 * INT(L / (PI * 2));
+                return TIET[INT((L / PI) * 12)] || "";
+            }
+
+            function getLunarMonth11(yy, tz) {
+                const off = jdFromDate(31, 12, yy) - 2415021, k = INT(off / 29.530588853);
+                let nm = getNewMoonDay(k, tz);
+                if (getSunLongitude(nm, tz) >= 9) nm = getNewMoonDay(k - 1, tz);
+                return nm;
+            }
+
+            function getLeapMonthOffset(a11, tz) {
+                const k = INT((a11 - 2415021.076998695) / 29.530588853 + 0.5);
+                let last = 0, i = 1, arc = getSunLongitude(getNewMoonDay(k + i, tz), tz);
+                do { last = arc; i++; arc = getSunLongitude(getNewMoonDay(k + i, tz), tz); } while (arc !== last && i < 14);
+                return i - 1;
+            }
+
+            function convertSolar2Lunar(dd, mm, yy) {
+                const dayNumber = jdFromDate(dd, mm, yy), k = INT((dayNumber - 2415021.076998695) / 29.530588853);
+                let monthStart = getNewMoonDay(k + 1, VN_TZ);
+                if (monthStart > dayNumber) monthStart = getNewMoonDay(k, VN_TZ);
+                let a11 = getLunarMonth11(yy, VN_TZ), b11 = a11, lunarYear;
+                if (a11 >= monthStart) { lunarYear = yy; a11 = getLunarMonth11(yy - 1, VN_TZ); }
+                else { lunarYear = yy + 1; b11 = getLunarMonth11(yy + 1, VN_TZ); }
+                const lunarDay = dayNumber - monthStart + 1, diff = INT((monthStart - a11) / 29);
+                let lunarLeap = false, lunarMonth = diff + 11;
+                if (b11 - a11 > 365) {
+                    const leapMonthDiff = getLeapMonthOffset(a11, VN_TZ);
+                    if (diff >= leapMonthDiff) { lunarMonth = diff + 10; if (diff === leapMonthDiff) lunarLeap = true; }
+                }
+                if (lunarMonth > 12) lunarMonth -= 12;
+                if (lunarMonth >= 11 && diff < 4) lunarYear -= 1;
+
+                const nextMonthStart = getNewMoonDay(INT((monthStart - 2415021.076998695) / 29.530588853 + 0.5) + 1, VN_TZ);
+                const monthLength = nextMonthStart - monthStart;
+                const yearCanChi = `${CAN[(lunarYear + 6) % 10]} ${CHI[(lunarYear + 8) % 12]}`;
+                const dayCanChi = `${CAN[(dayNumber + 9) % 10]} ${CHI[(dayNumber + 1) % 12]}`;
+                const monthCanChi = `${CAN[(lunarYear * 12 + lunarMonth + 3) % 10]} ${CHI[(lunarMonth + 1) % 12]}${lunarLeap ? " (Nhuận)" : ""}`;
+
+                let specialEvent = "";
+                if (lunarMonth === 1 && lunarDay === 1 && !lunarLeap) specialEvent = "Tết Nguyên Đán";
+                else if (lunarMonth === 12 && lunarDay === monthLength && !lunarLeap) specialEvent = "Giao Thừa";
+                else if (lunarMonth === 3 && lunarDay === 10 && !lunarLeap) specialEvent = "Giỗ Tổ Hùng Vương";
+                else if (lunarMonth === 8 && lunarDay === 15 && !lunarLeap) specialEvent = "Tết Trung Thu";
+                else if (lunarDay === 1) specialEvent = `Mùng 1/${lunarMonth}${lunarLeap ? "N" : ""}`;
+                else if (lunarDay === 15) specialEvent = `Rằm T${lunarMonth}${lunarLeap ? "N" : ""}`;
+
+                return { day: lunarDay, month: lunarMonth, year: lunarYear, isLeap: lunarLeap, monthLength, yearCanChi, monthCanChi, dayCanChi, solarTerm: getSolarTermName(dayNumber, VN_TZ), specialEvent };
+            }
+            return { convertSolar2Lunar };
+        })();
+
+        /* LƯU TRỮ LOCALSTORAGE */
+        const StorageService = (() => {
+            const PREFIX = "vn_cal_day_", THEME_KEY = "vn_cal_theme_pref";
+            const isValidKey = s => /^\d{4}-\d{2}-\d{2}$/.test(s);
+
+            function normalize(tasks) {
+                if (!Array.isArray(tasks)) return [];
+                const list = tasks.filter(t => t && String(t.title || "").trim() !== "").map(t => ({
+                    id: String(t.id || `t_${Date.now()}_${Math.random().toString(36).slice(2,6)}`),
+                    title: String(t.title).trim(),
+                    startTime: String(t.startTime || "").trim(),
+                    endTime: String(t.endTime || "").trim(),
+                    location: String(t.location || "").trim(),
+                    notes: String(t.notes || "").trim(),
+                    completed: Boolean(t.completed)
+                }));
+                list.sort((a, b) => (a.startTime && b.startTime) ? a.startTime.localeCompare(b.startTime) : (a.startTime ? -1 : (b.startTime ? 1 : 0)));
+                return list;
+            }
+
+            function getDaySchedules(key) {
+                if (!isValidKey(key)) return [];
+                try { return normalize(JSON.parse(localStorage.getItem(PREFIX + key) || "[]")); } catch { return []; }
+            }
+
+            function saveDaySchedules(key, tasks) {
+                const cleaned = normalize(tasks);
+                if (cleaned.length === 0) localStorage.removeItem(PREFIX + key);
+                else localStorage.setItem(PREFIX + key, JSON.stringify(cleaned));
+            }
+
+            function getAllDaysMap() {
+                const map = {};
+                for (let i = 0; i < localStorage.length; i++) {
+                    const k = localStorage.key(i);
+                    if (k && k.startsWith(PREFIX)) {
+                        const dKey = k.replace(PREFIX, "");
+                        const list = getDaySchedules(dKey);
+                        if (list.length > 0) map[dKey] = list;
+                    }
+                }
+                return map;
+            }
+
+            return {
+                getDaySchedules, saveDaySchedules, getAllDaysMap,
+                exportBackup: () => ({ app: "VN_PERSONAL_CALENDAR", version: "1.0", days: getAllDaysMap() }),
+                importBackup: (payload, mode) => {
+                    if (!payload || payload.app !== "VN_PERSONAL_CALENDAR" || typeof payload.days !== "object") throw new Error("Tệp không hợp lệ!");
+                    if (mode === "replace") {
+                        Object.keys(getAllDaysMap()).forEach(d => localStorage.removeItem(PREFIX + d));
+                    }
+                    Object.entries(payload.days).forEach(([dKey, list]) => {
+                        if (isValidKey(dKey) && Array.isArray(list)) {
+                            const merged = mode === "replace" ? list : [...getDaySchedules(dKey), ...list];
+                            saveDaySchedules(dKey, merged);
+                        }
+                    });
+                },
+                clearAll: () => Object.keys(getAllDaysMap()).forEach(d => localStorage.removeItem(PREFIX + d)),
+                getTheme: () => localStorage.getItem(THEME_KEY) || "light",
+                setTheme: t => localStorage.setItem(THEME_KEY, t)
+            };
+        })();
+
+        /* ĐIỀU KHIỂN GIAO DIỆN */
+        const CalendarApp = (() => {
+            const WEEKDAYS = ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"];
+            function getTodayVN() {
+                const parts = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Ho_Chi_Minh", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date());
+                const m = {}; parts.forEach(p => m[p.type] = p.value);
+                return { year: +m.year, month: +m.month, day: +m.day };
+            }
+
+            let today = getTodayVN(), viewYear = today.year, viewMonth = today.month, selected = { ...today };
+            const fmtKey = (y, m, d) => `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+            const esc = s => { const d = document.createElement("div"); d.textContent = s || ""; return d.innerHTML; };
+
+            function toast(msg, type = "success") {
+                const el = document.createElement("div");
+                el.className = `toast ${type}`; el.textContent = msg;
+                document.getElementById("toastContainer").appendChild(el);
+                setTimeout(() => el.remove(), 2600);
+            }
+
+            function renderMonth() {
+                today = getTodayVN();
+                document.getElementById("selectMonth").value = viewMonth;
+                document.getElementById("selectYear").value = viewYear;
+                const daysInMonth = new Date(viewYear, viewMonth, 0).getDate();
+                const firstCol = (new Date(viewYear, viewMonth - 1, 1).getDay() + 6) % 7;
+                const prevM = viewMonth === 1 ? 12 : viewMonth - 1, prevY = viewMonth === 1 ? viewYear - 1 : viewYear;
+                const daysPrev = new Date(prevY, prevM, 0).getDate();
+
+                document.getElementById("currentMonthLabel").textContent = `Tháng ${String(viewMonth).padStart(2, "0")} / ${viewYear}`;
+                const lStart = VnLunarEngine.convertSolar2Lunar(1, viewMonth, viewYear);
+                const lEnd = VnLunarEngine.convertSolar2Lunar(daysInMonth, viewMonth, viewYear);
+                document.getElementById("currentLunarMonthSummary").textContent = `Âm lịch: ${lStart.day}/${lStart.month} đến ${lEnd.day}/${lEnd.month} (${lEnd.yearCanChi})`;
+
+                const grid = document.getElementById("calendarGrid");
+                grid.innerHTML = "";
+
+                for (let i = 0; i < 42; i++) {
+                    let y = viewYear, m = viewMonth, d, cur = true;
+                    if (i < firstCol) { d = daysPrev - firstCol + 1 + i; m = prevM; y = prevY; cur = false; }
+                    else if (i >= firstCol + daysInMonth) { d = i - (firstCol + daysInMonth) + 1; m = viewMonth === 12 ? 1 : viewMonth + 1; y = viewMonth === 12 ? viewYear + 1 : viewYear; cur = false; }
+                    else { d = i - firstCol + 1; }
+
+                    const lunar = VnLunarEngine.convertSolar2Lunar(d, m, y);
+                    const tasks = StorageService.getDaySchedules(fmtKey(y, m, d));
+                    const cell = document.createElement("div");
+                    cell.className = `day-cell ${!cur ? "other-month" : ""} ${i % 7 === 6 ? "sunday" : ""} ${(y === today.year && m === today.month && d === today.day) ? "is-today" : ""} ${(y === selected.year && m === selected.month && d === selected.day) ? "is-selected" : ""}`;
+
+                    const lBadge = (lunar.day === 1 || d === 1) ? `${lunar.day}/${lunar.month}${lunar.isLeap ? "N" : ""}` : `${lunar.day}`;
+                    const done = tasks.filter(t => t.completed).length;
+                    const taskBadge = tasks.length ? `<div class="task-indicator ${done === tasks.length ? "all-done" : "has-pending"}"><span>${done === tasks.length ? "✔" : "📌"}</span><span>${done}/${tasks.length}</span></div>` : "";
+
+                    cell.innerHTML = `
+                        <div class="day-top">
+                            <span class="solar-num">${d}</span>
+                            <span class="lunar-badge ${(lunar.day === 1 || lunar.day === 15) ? "lunar-special" : ""}">${lBadge}</span>
+                        </div>
+                        <div class="day-bottom">
+                            ${lunar.specialEvent ? `<div class="lunar-event-tag">${lunar.specialEvent}</div>` : ""}
+                            ${taskBadge}
+                        </div>
+                    `;
+                    cell.onclick = () => {
+                        selected = { year: y, month: m, day: d };
+                        viewYear = y; viewMonth = m;
+                        renderMonth(); renderDetail();
+                        if (window.innerWidth < 900) document.getElementById("detailPanel").scrollIntoView({ behavior: "smooth" });
+                    };
+                    grid.appendChild(cell);
+                }
+            }
+
+            function renderDetail() {
+                const { year, month, day } = selected;
+                const lunar = VnLunarEngine.convertSolar2Lunar(day, month, year);
+                const dKey = fmtKey(year, month, day);
+
+                document.getElementById("detailWeekday").textContent = WEEKDAYS[new Date(year, month - 1, day).getDay()];
+                document.getElementById("detailSolarDay").textContent = String(day).padStart(2, "0");
+                document.getElementById("detailSolarMonthYear").textContent = `Tháng ${String(month).padStart(2, "0")} năm ${year}`;
+                document.getElementById("detailLunarDate").textContent = `${String(lunar.day).padStart(2, "0")}/${String(lunar.month).padStart(2, "0")}${lunar.isLeap ? " (Nhuận)" : ""}/${lunar.year}`;
+                document.getElementById("detailCanChi").textContent = `Ngày ${lunar.dayCanChi} • Năm ${lunar.yearCanChi}`;
+                document.getElementById("detailSolarTerm").textContent = lunar.specialEvent ? `${lunar.solarTerm} (${lunar.specialEvent})` : lunar.solarTerm;
+
+                const tasks = StorageService.getDaySchedules(dKey);
+                document.getElementById("taskCountBadge").textContent = tasks.length;
+                const list = document.getElementById("scheduleList");
+                list.innerHTML = tasks.length ? "" : `<div style="text-align:center;padding:16px;color:var(--text-muted);font-size:0.84rem;border:1px dashed var(--border-color);border-radius:8px;">Chưa có lịch trình ngày ${day}/${month}/${year}</div>`;
+
+                tasks.forEach(t => {
+                    const el = document.createElement("div");
+                    el.className = `schedule-item ${t.completed ? "completed" : ""}`;
+                    const timeStr = t.startTime ? (t.endTime ? `${t.startTime} – ${t.endTime}` : t.startTime) : "Cả ngày";
+                    el.innerHTML = `
+                        <input type="checkbox" class="schedule-checkbox" ${t.completed ? "checked" : ""}>
+                        <div class="schedule-content">
+                            <span class="schedule-time">🕒 ${esc(timeStr)}</span>
+                            <div class="schedule-title">${esc(t.title)}</div>
+                            ${t.location ? `<div class="schedule-meta">📍 ${esc(t.location)}</div>` : ""}
+                            ${t.notes ? `<div class="schedule-meta">📝 ${esc(t.notes)}</div>` : ""}
+                        </div>
+                        <div class="schedule-actions">
+                            <button type="button" class="btn btn-sm edit-btn">✏️</button>
+                            <button type="button" class="btn btn-sm del-btn">🗑️</button>
+                        </div>
+                    `;
+                    el.querySelector(".schedule-checkbox").onchange = e => {
+                        t.completed = e.target.checked;
+                        StorageService.saveDaySchedules(dKey, tasks);
+                        renderMonth(); renderDetail();
+                    };
+                    el.querySelector(".edit-btn").onclick = () => {
+                        document.getElementById("editingTaskId").value = t.id;
+                        document.getElementById("taskStartTime").value = t.startTime;
+                        document.getElementById("taskEndTime").value = t.endTime;
+                        document.getElementById("taskTitle").value = t.title;
+                        document.getElementById("taskLocation").value = t.location;
+                        document.getElementById("taskNotes").value = t.notes;
+                        document.getElementById("formTitle").textContent = "✏️ Sửa lịch trình";
+                        document.getElementById("btnCancelEdit").style.display = "inline-flex";
+                        document.getElementById("taskTitle").focus();
+                    };
+                    el.querySelector(".del-btn").onclick = () => {
+                        if (confirm(`Xóa công việc "${t.title}"?`)) {
+                            StorageService.saveDaySchedules(dKey, tasks.filter(x => x.id !== t.id));
+                            renderMonth(); renderDetail(); toast("Đã xóa công việc");
+                        }
+                    };
+                    list.appendChild(el);
+                });
+            }
+
+            function init() {
+                const sm = document.getElementById("selectMonth"), sy = document.getElementById("selectYear");
+                for (let m = 1; m <= 12; m++) sm.innerHTML += `<option value="${m}">Tháng ${m}</option>`;
+                for (let y = 1950; y <= 2100; y++) sy.innerHTML += `<option value="${y}">Năm ${y}</option>`;
+
+                const theme = StorageService.getTheme();
+                document.documentElement.setAttribute("data-theme", theme);
+
+                document.getElementById("btnToday").onclick = () => { today = getTodayVN(); selected = { ...today }; viewYear = today.year; viewMonth = today.month; renderMonth(); renderDetail(); };
+                document.getElementById("btnPrevMonth").onclick = () => { if (viewMonth === 1) { viewMonth = 12; viewYear--; } else viewMonth--; renderMonth(); };
+                document.getElementById("btnNextMonth").onclick = () => { if (viewMonth === 12) { viewMonth = 1; viewYear++; } else viewMonth++; renderMonth(); };
+                sm.onchange = e => { viewMonth = +e.target.value; renderMonth(); };
+                sy.onchange = e => { viewYear = +e.target.value; renderMonth(); };
+
+                document.getElementById("btnThemeToggle").onclick = () => {
+                    const next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+                    document.documentElement.setAttribute("data-theme", next);
+                    StorageService.setTheme(next);
+                };
+
+                const resetForm = () => {
+                    document.getElementById("scheduleForm").reset();
+                    document.getElementById("editingTaskId").value = "";
+                    document.getElementById("formTitle").textContent = "✨ Thêm lịch trình";
+                    document.getElementById("btnCancelEdit").style.display = "none";
+                };
+                document.getElementById("btnCancelEdit").onclick = resetForm;
+                document.getElementById("btnScrollToForm").onclick = () => { resetForm(); document.getElementById("taskTitle").focus(); };
+
+                document.getElementById("scheduleForm").onsubmit = e => {
+                    e.preventDefault();
+                    const dKey = fmtKey(selected.year, selected.month, selected.day);
+                    const id = document.getElementById("editingTaskId").value;
+                    const item = {
+                        id: id || `t_${Date.now()}`,
+                        startTime: document.getElementById("taskStartTime").value,
+                        endTime: document.getElementById("taskEndTime").value,
+                        title: document.getElementById("taskTitle").value,
+                        location: document.getElementById("taskLocation").value,
+                        notes: document.getElementById("taskNotes").value,
+                        completed: false
+                    };
+                    const tasks = StorageService.getDaySchedules(dKey);
+                    if (id) {
+                        const idx = tasks.findIndex(x => x.id === id);
+                        if (idx > -1) item.completed = tasks[idx].completed;
+                        tasks.splice(idx, 1, item);
+                    } else tasks.push(item);
+                    StorageService.saveDaySchedules(dKey, tasks);
+                    resetForm(); renderMonth(); renderDetail(); toast("Đã lưu lịch trình!");
+                };
+
+                document.getElementById("btnLoadSampleDay").onclick = () => {
+                    const dKey = fmtKey(selected.year, selected.month, selected.day);
+                    const cur = StorageService.getDaySchedules(dKey);
+                    StorageService.saveDaySchedules(dKey, [...cur,
+                        { startTime: "07:00", endTime: "08:00", title: "Tập thể dục", completed: true },
+                        { startTime: "08:30", endTime: "11:30", title: "Học lập trình C", completed: false },
+                        { startTime: "14:00", endTime: "16:00", title: "Làm bài tập đại học", completed: false }
+                    ]);
+                    renderMonth(); renderDetail(); toast("Đã thêm lịch mẫu!");
+                };
+
+                document.getElementById("btnExportJson").onclick = () => {
+                    const blob = new Blob([JSON.stringify(StorageService.exportBackup(), null, 2)], { type: "application/json" });
+                    const a = document.createElement("a");
+                    a.href = URL.createObjectURL(blob);
+                    a.download = `lich-ca-nhan-backup.json`;
+                    a.click();
+                };
+
+                document.getElementById("inputImportJson").onchange = e => {
+                    const f = e.target.files[0]; if (!f) return;
+                    const r = new FileReader();
+                    r.onload = ev => {
+                        try {
+                            StorageService.importBackup(JSON.parse(ev.target.result), confirm("Bấm OK để GỘP vào lịch hiện tại, hoặc Cancel để THAY THẾ toàn bộ?") ? "merge" : "replace");
+                            renderMonth(); renderDetail(); toast("Đã khôi phục dữ liệu!");
+                        } catch (err) { alert(err.message); }
+                    };
+                    r.readAsText(f);
+                };
+
+                document.getElementById("btnClearAllData").onclick = () => {
+                    if (confirm("Xóa toàn bộ lịch trình đã lưu?")) { StorageService.clearAll(); renderMonth(); renderDetail(); toast("Đã xóa toàn bộ!"); }
+                };
+
+                renderMonth(); renderDetail();
+            }
+            return { init };
+        })();
+
+        document.addEventListener("DOMContentLoaded", CalendarApp.init);
+    </script>
+</body>
+</html>
